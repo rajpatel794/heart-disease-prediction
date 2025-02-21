@@ -31,6 +31,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add *.sql *.SQL
-          git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
-          git push || echo "⚠️ No changes to push"
+          
+          # Check if there are any .sql or .SQL files before adding
+          if ls *.sql 1> /dev/null 2>&1 || ls *.SQL 1> /dev/null 2>&1; then
+            git add *.sql *.SQL
+            git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
+            git push || echo "⚠️ No changes to push"
+          else
+            echo "⚠️ No SQL files to commit"
+          fi
