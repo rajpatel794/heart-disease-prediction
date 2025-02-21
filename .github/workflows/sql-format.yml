@@ -24,7 +24,7 @@ jobs:
         run: |
           find . -type f \( -iname "*.sql" -o -iname "*.SQL" \) | while read file; do
             echo "⚡ Formatting $file..."
-            sqlformat --inputFile "$file" --outputFile "$file"
+            sqlformat --inputFile "$file" --outputFile "$file" --statementBreaks 1
           done
 
       - name: 🚀 Commit formatted SQL files
