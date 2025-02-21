@@ -48,7 +48,11 @@ jobs:
             git add "$file"
           done
 
-          git commit --amend --no-edit
-          git fetch origin master
-          git rebase origin/master || echo "⚠️ Rebase failed, manual intervention needed"
-          git push --force-with-lease || echo "⚠️ No changes to push"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git commit --amend --no-edit
+            git fetch origin master
+            git rebase origin/master || echo "⚠️ Rebase failed, manual intervention needed"
+            git push --force-with-lease || echo "⚠️ No changes to push"
+          else
+            echo "⚠️ No changes detected after formatting. Skipping commit."
+          fi
