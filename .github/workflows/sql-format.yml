@@ -42,13 +42,24 @@ jobs:
 
       - name: 🚀 Commit formatted SQL files
         run: |
-          # Check if there are formatting changes before committing
-          if [[ -n "$(git diff --name-only)" ]]; then
-            git config --global user.name "github-actions"
-            git config --global user.email "github-actions@github.com"
-            git add $CHANGED_FILES
-            git commit -m "🔄 Auto-formatted SQL files"
-            git push || echo "⚠️ No changes to push"
-          else
+          # Check if there are modified files
+          CHANGED_FILES=$(git diff --name-only -- '*.sql' '*.SQL')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
             echo "⚠️ No formatting changes detected. Skipping commit."
+            exit 0
           fi
+
+          echo "🔄 Adding formatted SQL files..."
+          echo "$CHANGED_FILES"
+
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          # Use a loop to add each file separately (to avoid issues)
+          for file in $CHANGED_FILES; do
+            git add "$file"
+          done
+
+          git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
+          git push || echo "⚠️ No changes to push"
