@@ -23,7 +23,7 @@ jobs:
       - name: 🔄 Format only changed SQL files
         run: |
           # Find changed SQL files in the last commit
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- '*.sql' '*.SQL')
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} -- '*.sql' '*.SQL')
 
           if [[ -z "$CHANGED_FILES" ]]; then
             echo "⚠️ No changed SQL files found. Skipping formatting."
