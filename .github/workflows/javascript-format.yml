@@ -1,0 +1,52 @@
+name: Auto-Format JavaScript Code with Prettier
+
+on:
+  push:  
+  pull_request:  
+
+jobs:
+  format-javascript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: 🔄 Format only changed JavaScript files
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- '*.js' '*.ts')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "⚠️ No changed JavaScript files found. Skipping formatting."
+            exit 0
+          fi
+
+          echo "📂 Changed JavaScript files detected:"
+          echo "$CHANGED_FILES"
+
+          for file in $CHANGED_FILES; do
+            echo "⚡ Formatting $file..."
+            tools/javascript/node_modules/.bin/prettier --write "$file"
+          done
+
+      - name: 🚀 Commit formatted JavaScript files
+        run: |
+          CHANGED_FILES=$(git diff --name-only -- '*.js' '*.ts')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "⚠️ No formatting changes detected. Skipping commit."
+            exit 0
+          fi
+
+          echo "🔄 Adding formatted JavaScript files..."
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          for file in $CHANGED_FILES; do
+            git add "$file"
+          done
+
+          git commit -m "🔄 Auto-formatted JavaScript files" || echo "⚠️ No changes to commit"
+          git push || echo "⚠️ No changes to push"
