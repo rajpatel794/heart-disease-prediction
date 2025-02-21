@@ -20,26 +20,33 @@ jobs:
       - name: 🛠 Install Poor Man’s T-SQL Formatter CLI
         run: npm install -g poor-mans-t-sql-formatter-cli
 
-      - name: 🔄 Format all SQL files
+      - name: 🔄 Format only changed SQL files
         run: |
-          find . -type f \( -iname "*.sql" -o -iname "*.SQL" \) | while read file; do
+          # Find changed SQL files in the last commit
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- '*.sql' '*.SQL')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "⚠️ No changed SQL files found. Skipping formatting."
+            exit 0
+          fi
+
+          echo "📂 Changed SQL files detected:"
+          echo "$CHANGED_FILES"
+
+          for file in $CHANGED_FILES; do
             echo "⚡ Formatting $file..."
             sqlformat --inputFile "$file" --outputFile "$file" --statementBreaks 1
           done
 
       - name: 🚀 Commit formatted SQL files
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          # Find and add only existing .sql or .SQL files
-          files_to_commit=$(find . -type f \( -iname "*.sql" -o -iname "*.SQL" \))
-          
-          if [[ -n "$files_to_commit" ]]; then
-            echo "🔄 Adding formatted SQL files..."
-            git add $files_to_commit
-            git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
+          # Check if there are formatting changes before committing
+          if [[ -n "$(git diff --name-only)" ]]; then
+            git config --global user.name "github-actions"
+            git config --global user.email "github-actions@github.com"
+            git add $CHANGED_FILES
+            git commit -m "🔄 Auto-formatted SQL files"
             git push || echo "⚠️ No changes to push"
           else
-            echo "⚠️ No SQL files to commit"
+            echo "⚠️ No formatting changes detected. Skipping commit."
           fi
