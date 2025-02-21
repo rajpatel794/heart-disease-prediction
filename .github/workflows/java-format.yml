@@ -48,5 +48,5 @@ jobs:
             git add "$file"
           done
 
-          git commit -m "🔄 Auto-formatted Java files" || echo "⚠️ No changes to commit"
-          git push || echo "⚠️ No changes to push"
+          git commit --amend --no-edit
+          git push --force-with-lease || echo "⚠️ No changes to push"
