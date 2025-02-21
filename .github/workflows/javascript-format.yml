@@ -33,7 +33,7 @@ jobs:
 
       - name: 🚀 Commit formatted JavaScript files
         run: |
-          CHANGED_FILES=$(git diff --name-only -- '*.js' '*.ts')
+          CHANGED_FILES=$(git diff --name-only -- '*.js' '*.jsx' '*.ts' '*.tsx')
 
           if [[ -z "$CHANGED_FILES" ]]; then
             echo "⚠️ No formatting changes detected. Skipping commit."
