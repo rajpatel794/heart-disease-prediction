@@ -24,7 +24,7 @@ jobs:
         run: |
           find . -type f \( -iname "*.sql" -o -iname "*.SQL" \) | while read file; do
             echo "⚡ Formatting $file..."
-            poor-mans-t-sql-formatter-cli --file "$file" --overwrite
+            sqlformat --file "$file" --overwrite
           done
 
       - name: 🚀 Commit formatted SQL files
