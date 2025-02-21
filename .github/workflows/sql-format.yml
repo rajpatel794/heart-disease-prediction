@@ -1,0 +1,31 @@
+name: Auto-Format DB2 SQL Files
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  format-sql:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🛠 Install sqlfluff
+        run: pip install sqlfluff
+
+      - name: 🔄 Format all SQL files
+        run: |
+          find . -name "*.sql" | while read file; do
+            echo "⚡ Formatting $file..."
+            sqlfluff fix --dialect tsql "$file" --force
+          done
+
+      - name: 🚀 Commit formatted SQL files
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add *.sql
+          git commit -m "🔄 Auto-formatted SQL files" || echo "No changes to commit"
+          git push
