@@ -31,10 +31,13 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
+          # Find and add only existing .sql or .SQL files
+          files_to_commit=$(find . -type f \( -iname "*.sql" -o -iname "*.SQL" \))
           
-          # Check if there are any .sql or .SQL files before adding
-          if ls *.sql 1> /dev/null 2>&1 || ls *.SQL 1> /dev/null 2>&1; then
-            git add *.sql *.SQL
+          if [[ -n "$files_to_commit" ]]; then
+            echo "🔄 Adding formatted SQL files..."
+            git add $files_to_commit
             git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
             git push || echo "⚠️ No changes to push"
           else
