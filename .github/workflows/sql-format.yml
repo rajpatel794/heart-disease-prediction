@@ -19,7 +19,7 @@ jobs:
         run: |
           find . -name "*.sql" | while read file; do
             echo "⚡ Formatting $file..."
-            sqlfluff fix --dialect tsql "$file" --force
+            sqlfluff fix --dialect db2 "$file" --force
           done
 
       - name: 🚀 Commit formatted SQL files
