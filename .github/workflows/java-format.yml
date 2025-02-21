@@ -48,11 +48,5 @@ jobs:
             git add "$file"
           done
 
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git commit --amend --no-edit
-            git fetch origin master
-            git rebase origin/master || echo "⚠️ Rebase failed, manual intervention needed"
-            git push --force-with-lease || echo "⚠️ No changes to push"
-          else
-            echo "⚠️ No changes detected after formatting. Skipping commit."
-          fi
+          git commit -m "🔄 Auto-formatted Java files" || echo "⚠️ No changes to commit"
+          git push || echo "⚠️ No changes to push"
