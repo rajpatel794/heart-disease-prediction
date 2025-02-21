@@ -12,17 +12,19 @@ jobs:
       - name: 🛎 Checkout repository
         uses: actions/checkout@v3
 
+      - name: 🛠 Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: 🛠 Install Poor Man’s T-SQL Formatter CLI
-        run: |
-          wget -O poorsql-cli.zip "https://github.com/TaoK/PoorMansTSqlFormatter/releases/latest/download/PoorMansTSqlFormatter.zip"
-          unzip poorsql-cli.zip -d poorsql-cli
-          chmod +x poorsql-cli/poorformatter.exe
+        run: npm install -g poor-mans-t-sql-formatter-cli
 
       - name: 🔄 Format all SQL files
         run: |
           find . -type f \( -iname "*.sql" -o -iname "*.SQL" \) | while read file; do
             echo "⚡ Formatting $file..."
-            mono poorsql-cli/poorformatter.exe --file "$file"
+            poor-mans-t-sql-formatter-cli --file "$file" --overwrite
           done
 
       - name: 🚀 Commit formatted SQL files
