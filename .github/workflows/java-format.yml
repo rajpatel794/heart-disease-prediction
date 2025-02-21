@@ -49,4 +49,6 @@ jobs:
           done
 
           git commit --amend --no-edit
+          git fetch origin master
+          git rebase origin/master || echo "⚠️ Rebase failed, manual intervention needed"
           git push --force-with-lease || echo "⚠️ No changes to push"
