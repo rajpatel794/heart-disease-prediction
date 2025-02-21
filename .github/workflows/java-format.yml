@@ -1,0 +1,52 @@
+name: Auto-Format Java Code with Google Java Format
+
+on:
+  push:  
+  pull_request:  
+
+jobs:
+  format-java:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: 🔄 Format only changed Java files
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- '*.java')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "⚠️ No changed Java files found. Skipping formatting."
+            exit 0
+          fi
+
+          echo "📂 Changed Java files detected:"
+          echo "$CHANGED_FILES"
+
+          for file in $CHANGED_FILES; do
+            echo "⚡ Formatting $file..."
+            java -jar tools/java/google-java-format.jar --replace "$file"
+          done
+
+      - name: 🚀 Commit formatted Java files
+        run: |
+          CHANGED_FILES=$(git diff --name-only -- '*.java')
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "⚠️ No formatting changes detected. Skipping commit."
+            exit 0
+          fi
+
+          echo "🔄 Adding formatted Java files..."
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          for file in $CHANGED_FILES; do
+            git add "$file"
+          done
+
+          git commit -m "🔄 Auto-formatted Java files" || echo "⚠️ No changes to commit"
+          git push || echo "⚠️ No changes to push"
