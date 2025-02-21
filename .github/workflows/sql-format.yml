@@ -14,17 +14,8 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: 🛠 Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: 🛠 Install Poor Man’s T-SQL Formatter CLI
-        run: npm install -g poor-mans-t-sql-formatter-cli
-
       - name: 🔄 Format only changed SQL files
         run: |
-          # Find changed SQL files in the last commit
           CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- '*.sql' '*.SQL')
 
           if [[ -z "$CHANGED_FILES" ]]; then
@@ -37,12 +28,11 @@ jobs:
 
           for file in $CHANGED_FILES; do
             echo "⚡ Formatting $file..."
-            sqlformat --inputFile "$file" --outputFile "$file" --statementBreaks 1
+            tools/sql/node_modules/.bin/sqlformat --inputFile "$file" --outputFile "$file" --statementBreaks 1
           done
 
       - name: 🚀 Commit formatted SQL files
         run: |
-          # Check if there are modified files
           CHANGED_FILES=$(git diff --name-only -- '*.sql' '*.SQL')
 
           if [[ -z "$CHANGED_FILES" ]]; then
@@ -51,12 +41,9 @@ jobs:
           fi
 
           echo "🔄 Adding formatted SQL files..."
-          echo "$CHANGED_FILES"
-
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Use a loop to add each file separately (to avoid issues)
           for file in $CHANGED_FILES; do
             git add "$file"
           done

@@ -1,0 +1,3 @@
+--for sql
+npm install --prefix tools/sql poor-mans-t-sql-formatter-cli
+

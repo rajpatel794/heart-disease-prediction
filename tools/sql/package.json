@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "poor-mans-t-sql-formatter-cli": "^1.6.10"
+  }
+}
