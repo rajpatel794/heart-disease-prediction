@@ -1,8 +1,8 @@
-name: Auto-Format DB2 SQL Files
+name: Auto-Format SQL with Poor Man’s T-SQL Formatter
 
 on:
-  push:
-  pull_request:
+  push:  
+  pull_request:  
 
 jobs:
   format-sql:
@@ -12,20 +12,23 @@ jobs:
       - name: 🛎 Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🛠 Install sqlfluff
-        run: pip install sqlfluff
+      - name: 🛠 Install Poor Man’s T-SQL Formatter CLI
+        run: |
+          wget -O poorsql-cli.zip "https://github.com/TaoK/PoorMansTSqlFormatter/releases/latest/download/PoorMansTSqlFormatter.zip"
+          unzip poorsql-cli.zip -d poorsql-cli
+          chmod +x poorsql-cli/poorformatter.exe
 
       - name: 🔄 Format all SQL files
         run: |
-          find . -name "*.sql" | while read file; do
+          find . -type f \( -iname "*.sql" -o -iname "*.SQL" \) | while read file; do
             echo "⚡ Formatting $file..."
-            sqlfluff fix --dialect db2 "$file" --force
+            mono poorsql-cli/poorformatter.exe --file "$file"
           done
 
       - name: 🚀 Commit formatted SQL files
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add *.sql
-          git commit -m "🔄 Auto-formatted SQL files" || echo "No changes to commit"
-          git push
+          git add *.sql *.SQL
+          git commit -m "🔄 Auto-formatted SQL files" || echo "⚠️ No changes to commit"
+          git push || echo "⚠️ No changes to push"
