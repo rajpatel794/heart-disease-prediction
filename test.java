@@ -10,6 +10,12 @@ public class test {
     names.add("Bob");
     names.add("Charlie");
 
+
+
+
+
+
+    
     for (String name : names) {
       System.out.println("Hello, " + name + "!");
     }
