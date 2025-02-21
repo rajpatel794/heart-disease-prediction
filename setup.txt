@@ -6,3 +6,7 @@ curl -LJO "https://github.com/google/google-java-format/releases/download/v1.25.
 
 mkdir -p tools/java
 mv google-java-format-1.25.2-all-deps.jar tools/java/google-java-format.jar
+
+--for python
+mkdir -p tools/python
+pip install --target=tools/python black
